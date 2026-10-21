@@ -15,10 +15,9 @@ fn is_transient_node_error(e: &CdpError) -> bool {
     }
 }
 
-/// 启用 DOM 与 Runtime 并返回文档根 nodeId
+/// 启用 DOM 并返回文档根 nodeId
 pub fn get_document_root(client: &CdpClient, session_id: &str) -> Result<i64, CdpError> {
     client.send_with_session("DOM.enable", None, Some(session_id))?;
-    client.send_with_session("Runtime.enable", None, Some(session_id))?;
     let result = client.send_with_session("DOM.getDocument", None, Some(session_id))?;
     let root = result
         .get("root")
@@ -243,7 +242,6 @@ pub fn query_selector_all_including_same_origin_frames(
     selector: &str,
 ) -> Result<Vec<(i64, String)>, CdpError> {
     client.send_with_session("DOM.enable", None, Some(session_id))?;
-    client.send_with_session("Runtime.enable", None, Some(session_id))?;
     let escaped = serde_json::to_string(selector).map_err(CdpError::Json)?;
     // 递归收集 document + 所有同源 iframe 的 contentDocument 中匹配元素
     let expr = format!(

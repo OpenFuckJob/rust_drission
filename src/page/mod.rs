@@ -207,8 +207,7 @@ impl Page {
 
     /// 执行 JS（可为 async），等待 Promise 解析后返回结果；适用于 fetch 等异步表达式
     pub fn run_js_await(&self, script: &str) -> Result<Value, CdpError> {
-        self.client
-            .send_with_session("Runtime.enable", None, Some(self.session_id.as_str()))?;
+        // 不发 Runtime.enable：console 事件经 CDP 上网会触发 disable-devtool 计时检测
         let params = json!({
             "expression": script,
             "returnByValue": true,
@@ -225,8 +224,7 @@ impl Page {
 
     /// 执行 JS，返回 Runtime.evaluate 的 result
     pub fn evaluate(&self, js: &str) -> Result<Value, CdpError> {
-        self.client
-            .send_with_session("Runtime.enable", None, Some(self.session_id.as_str()))?;
+        // 同上：Runtime.evaluate 不依赖 Runtime.enable
         let params = json!({
             "expression": js,
             "returnByValue": true,

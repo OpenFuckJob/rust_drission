@@ -105,7 +105,7 @@ impl AsyncPage {
 
     /// 执行 JS（可为 async），等待 Promise 解析后返回结果。
     pub async fn run_js_await(&self, script: &str) -> Result<Value, CdpError> {
-        self.run_cdp("Runtime.enable", None).await?;
+        // 不发 Runtime.enable：与同步版一致，避免 console 事件触发计时检测
         let params = json!({
             "expression": script,
             "returnByValue": true,
@@ -118,7 +118,6 @@ impl AsyncPage {
 
     /// 执行 JS，返回 Runtime.evaluate 的 result。
     pub async fn evaluate(&self, js: &str) -> Result<Value, CdpError> {
-        self.run_cdp("Runtime.enable", None).await?;
         let params = json!({
             "expression": js,
             "returnByValue": true,
